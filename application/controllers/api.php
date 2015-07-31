@@ -121,7 +121,6 @@ class Api extends CI_Controller {
 		$data->phone=$user->phone;
 		$data->name=$user->name;
 		$data->gender=$user->gender;
-		$data->contacts=$user->contacts;
 		$data->time=$user->time;
 		$data->device=$_POST['device'];
 		$data->subAccountSid=$user->subAccountSid;
