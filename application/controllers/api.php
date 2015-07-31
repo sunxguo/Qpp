@@ -203,9 +203,9 @@ class Api extends CI_Controller {
 	//获取全部联系人
 	public function getAllContacts(){
 		$echoData=new stdClass;
-		if(!isset($_GET['id']) || !isset($_GET['token'])){
+		if(!isset($_GET['token'])){
 			$echoData->result=1;
-			$echoData->data='id and token can not be null!';
+			$echoData->data='Token can not be null!';
 			echo json_encode($echoData);
 			return false;
 		}
@@ -218,21 +218,28 @@ class Api extends CI_Controller {
 		}
 		$user=$checkTokenResult->data;
 		$userId=$user->id;
-		if(!$this->common->isExist('user',array('id'=>$userId))){
-			$echoData->result=2;
-			$echoData->data='This user does`t exist!';
-			echo json_encode($echoData);
-			return false;
-		}
 		$condition=array(
 			'table' => 'contact',
 			'result' => 'data',
 			'where' => array('userId' => $userId),
+			'join' => array('user' => 'user.id = contact.contactId'),
 			'order_by' => array('note' => 'asc')
 		);
 		$contacts=$this->common->getData($condition);
+		$allContacts=array();
+		foreach ($contacts as $key => $value) {
+			$contact=new stdClass;
+			$contact->id=$value->contactId;
+			$contact->note=$value->note;
+			$contact->username=$value->username;
+			$contact->name=$value->name;
+			$contact->email=$value->email;
+			$contact->signature=$value->signature;
+			$contact->avatar=$value->avatar;
+			$allContacts[]= $contact;
+		}
 		$echoData->result=0;
-		$echoData->data=$contacts;
+		$echoData->data=$allContacts;
 		echo json_encode($echoData);
 	}
 	//删除联系人

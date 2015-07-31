@@ -36,7 +36,7 @@ class DbHandler extends CI_Model{
 		if(isset($condition['join'])){
 			foreach($condition['join'] as $key=>$value){
 				//Example:$this->db->join('comments', 'comments.id = blogs.id');
-				$this->db->join($condition['join'][$key],$condition['join'][$value]);
+				$this->db->join($key,$value);
 			}
 		}
 		if(isset($condition['where'])){
