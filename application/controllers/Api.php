@@ -5,7 +5,7 @@ class Api extends CI_Controller {
 	function __construct(){
 		parent::__construct();
 		$this->load->library('Common');
-		$this->load->model("dbhandler");
+//		$this->load->model("dbhandler");
 	}
 	public function index(){
 		
