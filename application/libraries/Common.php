@@ -1,10 +1,10 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed'); 
+<?php if (!defined('basePATH')) exit('No direct script access allowed'); 
 
 class Common{
 	var $CI;
 	function __construct(){
 		$this->CI =& get_instance();
-		$this->CI->load->model("Base");
+		$this->CI->load->model("base");
 	}
 	
 	/**
@@ -12,7 +12,7 @@ class Common{
 	 * return object
 	 */
 	public function getOneData($condition){
-		$data=$this->CI->Base->selectData($condition);
+		$data=$this->CI->base->selectData($condition);
 		if(sizeof($data)>0)
 			return $data[0];
 		else
@@ -35,7 +35,7 @@ class Common{
 		return $this->getOneData($condition);
 	}
 	public function getData($condition){
-		return $this->CI->Base->selectData($condition);
+		return $this->CI->base->selectData($condition);
 	}
 	public function isExist($table,$where){
 		$result=false;
