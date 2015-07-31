@@ -1,5 +1,4 @@
-<?php
-defined('basePATH') OR exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed'); 
 
 class Api extends CI_Controller {
 	
