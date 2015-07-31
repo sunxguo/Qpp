@@ -6,7 +6,7 @@ class Api extends CI_Controller {
 	function __construct(){
 		parent::__construct();
 		$this->load->library('Common');
-		$this->load->model("Dbhandler");
+		$this->load->model("Base");
 	}
 	public function index(){
 		
@@ -50,7 +50,7 @@ class Api extends CI_Controller {
 			echo json_encode($echoData);
 			return false;
 		}
-		$this->Dbhandler->insertData('user',array(
+		$this->Base->insertData('user',array(
 			'email'=>$_POST['email'],
 			'password'=>md5('QppMK'.$_POST['password']),
 			'gender'=>2,
@@ -110,7 +110,7 @@ class Api extends CI_Controller {
 			'where'=>array('id'=>$user->id),
 			'data'=>array('device'=>$_POST['device'],'token'=>$token,'token_exptime'=>$tokenExptime)
 		);
-		$this->Dbhandler->updateData($updateData);
+		$this->Base->updateData($updateData);
 		//if(time()>$user->token_exptime)
 		$data=new stdClass;
 		$data->token=$token;
@@ -163,7 +163,7 @@ class Api extends CI_Controller {
 			echo json_encode($echoData);
 			return false;
 		}
-		$this->Dbhandler->insertData('contact',array(
+		$this->Base->insertData('contact',array(
 			'userId'=>$userId,
 			'contactId'=>$_POST['contactId']
 		));

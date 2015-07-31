@@ -4,7 +4,7 @@ class Common{
 	var $CI;
 	function __construct(){
 		$this->CI =& get_instance();
-		$this->CI->load->model("Dbhandler");
+		$this->CI->load->model("Base");
 	}
 	
 	/**
@@ -12,7 +12,7 @@ class Common{
 	 * return object
 	 */
 	public function getOneData($condition){
-		$data=$this->CI->Dbhandler->selectData($condition);
+		$data=$this->CI->Base->selectData($condition);
 		if(sizeof($data)>0)
 			return $data[0];
 		else
@@ -35,7 +35,7 @@ class Common{
 		return $this->getOneData($condition);
 	}
 	public function getData($condition){
-		return $this->CI->Dbhandler->selectData($condition);
+		return $this->CI->Base->selectData($condition);
 	}
 	public function isExist($table,$where){
 		$result=false;
