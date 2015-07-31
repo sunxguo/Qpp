@@ -4,7 +4,7 @@ class Common{
 	var $CI;
 	function __construct(){
 		$this->CI =& get_instance();
-		$this->CI->load->model("Dbhandler");
+		$this->CI->load->model("dbhandler");
 	}
 	
 	/**
