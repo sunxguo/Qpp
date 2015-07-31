@@ -42,11 +42,24 @@ class Api extends CI_Controller {
 			echo json_encode($echoData);
 			return false;
 		}
+		//在“云通讯”平台注册子账号
+		$subAccount=$this->common->createSubAccount($_POST['email']);
+		if($subAccount->result!=0){
+			$echoData->result=5;
+			$echoData->data='Sub Account registration failed!'.$subAccount->data;
+			echo json_encode($echoData);
+			return false;
+		}
 		$this->dbHandler->insertData('user',array(
 			'email'=>$_POST['email'],
 			'password'=>md5('QppMK'.$_POST['password']),
 			'gender'=>2,
-			'time'=>date("Y-m-d H:i:s")
+			'time'=>date("Y-m-d H:i:s"),
+			'subAccountSid'=>$subAccount->data->subAccountSid,
+			'subToken'=>$subAccount->data->subToken,
+			'dateCreated'=>$subAccount->data->dateCreated,
+			'voipAccount'=>$subAccount->data->voipAccount,
+			'voipPwd'=>$subAccount->data->voipPwd
 		));
 		$echoData->result=0;
 		$echoData->data='Registered successfully!';
@@ -110,10 +123,120 @@ class Api extends CI_Controller {
 		$data->gender=$user->gender;
 		$data->contacts=$user->contacts;
 		$data->time=$user->time;
-		$data->device=$user->device;
+		$data->device=$_POST['device'];
+		$data->subAccountSid=$user->subAccountSid;
+		$data->subToken=$user->subToken;
+		$data->dateCreated=$user->dateCreated;
+		$data->voipAccount=$user->voipAccount;
+		$data->voipPwd=$user->voipPwd;
 		
 		$echoData->result=0;
 		$echoData->data=$data;
 		echo json_encode($echoData);
+	}
+	//添加联系人
+	public function addContact(){
+		$echoData=new stdClass;
+		if(!isset($_POST['token']) || !isset($_POST['contactId'])){
+			$echoData->result=1;
+			$echoData->data='token and contactId can not be null!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$checkTokenResult=$this->common->checkToken($_POST['token']);
+		if(!$checkTokenResult->result){
+			$echoData->result=2;
+			$echoData->data=$checkTokenResult->data;
+			echo json_encode($echoData);
+			return false;
+		}
+		$user=$checkTokenResult->data;
+		$userId=$user->id;
+		if(!$this->common->isExist('user',array('id'=>$_POST['contactId']))){
+			$echoData->result=3;
+			$echoData->data='The contact does`t exist!';
+			echo json_encode($echoData);
+			return false;
+		}
+		if($this->common->isExist('contact',array('userId'=>$userId,'contactId'=>$_POST['contactId']))){
+			$echoData->result=4;
+			$echoData->data='The contact has been added as a friend!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$this->dbHandler->insertData('contact',array(
+			'userId'=>$userId,
+			'contactId'=>$_POST['contactId']
+		));
+		$echoData->result=0;
+		$echoData->data='Added successfully!';
+		echo json_encode($echoData);
+
+	}
+	//获取某个用户信息
+	public function getUser(){
+		$echoData=new stdClass;
+		if(!isset($_GET['id']) || !isset($_GET['token'])){
+			$echoData->result=1;
+			$echoData->data='id and token can not be null!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$checkTokenResult=$this->common->checkToken($_GET['token']);
+		if(!$checkTokenResult->result){
+			$echoData->result=2;
+			$echoData->data=$checkTokenResult->data;
+			echo json_encode($echoData);
+			return false;
+		}
+		if(!$this->common->isExist('user',array('id'=>$_GET['id']))){
+			$echoData->result=3;
+			$echoData->data='This user does`t exist!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$user=$this->common->getOneDataById('user',$_GET['id']);
+		$echoData->result=0;
+		$echoData->data=$user;
+		echo json_encode($echoData);
+	}
+	//获取全部联系人
+	public function getAllContacts(){
+		$echoData=new stdClass;
+		if(!isset($_GET['id']) || !isset($_GET['token'])){
+			$echoData->result=1;
+			$echoData->data='id and token can not be null!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$checkTokenResult=$this->common->checkToken($_GET['token']);
+		if(!$checkTokenResult->result){
+			$echoData->result=2;
+			$echoData->data=$checkTokenResult->data;
+			echo json_encode($echoData);
+			return false;
+		}
+		$user=$checkTokenResult->data;
+		$userId=$user->id;
+		if(!$this->common->isExist('user',array('id'=>$userId))){
+			$echoData->result=2;
+			$echoData->data='This user does`t exist!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$condition=array(
+			'table' => 'contact',
+			'result' => 'data',
+			'where' => array('userId' => $userId),
+			'order_by' => array('note' => 'asc')
+		);
+		$contacts=$this->common->getData($condition);
+		$echoData->result=0;
+		$echoData->data=$contacts;
+		echo json_encode($echoData);
+	}
+	//删除联系人
+	public function deleteContact(){
+
 	}
 }

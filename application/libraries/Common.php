@@ -18,11 +18,11 @@ class Common{
 		else
 			return array();
 	}
-	public function getOneDataById($type,$contentId){
+	public function getOneDataById($type,$id){
 		$condition=array(
 			'table'=>$type,
 			'result'=>'data',
-			'where'=>array($type.'_id'=>$contentId)
+			'where'=>array('id'=>$id)
 		);
 		return $this->getOneData($condition);
 	}
@@ -37,10 +37,10 @@ class Common{
 	public function getData($condition){
 		return $this->CI->dbHandler->selectData($condition);
 	}
-	public function isExist($type,$where){
+	public function isExist($table,$where){
 		$result=false;
 		$condition=array(
-			'table'=>$type,
+			'table'=>$table,
 			'result'=>'data',
 			'where'=>$where
 		);
@@ -49,6 +49,25 @@ class Common{
 			$result=true;
 		}
 		return $result;
+	}
+	public function checkToken($token){
+		$echoData=new stdClass;
+		if(!$this->isExist('user',array('token'=>$token))){
+			$echoData->result=false;
+			$echoData->data='This token is wrong!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$user=$this->getOneDataAdvance('user',array('token'=>$token));
+		if(time()>$user->token_exptime){
+			$echoData->result=false;
+			$echoData->data='The token timeout!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$echoData->result=true;
+		$echoData->data=$user;
+		return $echoData;
 	}
 	public function checkEmailFormat($email){
 		$regex = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[-_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,})$/i';
@@ -90,6 +109,47 @@ class Common{
 		);
 		return httpGet($url,$param,array());
 	}
+	public function createSubAccount($friendlyName){
+		//主帐号
+		$accountSid= 'aaf98f8944f35b130144f3b5412b0076';
+		//主帐号Token
+		$accountToken= 'f708d6bf0d33463bac5313571e91cbe9';
+		//应用Id
+		$appId='8a48b5514ecd7fa8014edc9c8ade1530';
+		//请求地址，格式如下，不需要写https://
+		$serverIP='sandboxapp.cloopen.com';
+		//请求端口 
+		$serverPort='8883';
+		//REST版本号
+		$softVersion='2013-12-26';
+		$this->CI->load->library('CCPRestSDK',array('ServerIP'=>$serverIP,'ServerPort'=>$serverPort,'SoftVersion'=>$softVersion));
+		$this->CI->ccprestsdk->setAccount($accountSid,$accountToken);
+   		$this->CI->ccprestsdk->setAppId($appId);
+   		// 调用云通讯平台的创建子帐号,绑定您的子帐号名称
+		//echo "Try to create a subaccount, binding to user $friendlyName <br/>";
+	    $result = $this->CI->ccprestsdk->CreateSubAccount($friendlyName);
+	    $echoData=new stdClass;
+	    if($result == NULL ) {
+	        $echoData->result=-1;
+			$echoData->data='result error!';
+	    }elseif($result->statusCode!=0) {
+	        $echoData->result=$result->statusCode;
+			$echoData->data=$result->statusMsg;
+	    }else {
+	        //echo "create SubbAccount success<br/>";
+	        // 获取返回信息
+	        $subaccount = $result->SubAccount;
+	        $echoData->result=0;
+	        $data=new stdClass;
+			$data->subAccountSid=$subaccount->subAccountSid;
+			$data->subToken=$subaccount->subToken;
+			$data->dateCreated=$subaccount->dateCreated;
+			$data->voipAccount=$subaccount->voipAccount;
+			$data->voipPwd=$subaccount->voipPwd;
+			$echoData->data=$data;
+	    }
+		return $echoData;
+	}
 	/*
 	public function globalSMS($phoneNumber,$text){
 		$param = array (
@@ -118,6 +178,7 @@ class Common{
 			return strtoupper(bin2hex(iconv('UTF-8', 'ASCII', $realStr)));
 		}
 	}*/
+
 }
 
 /* End of file Common.php */
