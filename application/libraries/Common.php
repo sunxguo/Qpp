@@ -55,15 +55,13 @@ class Common{
 		if(!$this->isExist('user',array('token'=>$token))){
 			$echoData->result=false;
 			$echoData->data='This token is wrong!';
-			echo json_encode($echoData);
-			return false;
+			return $echoData;
 		}
 		$user=$this->getOneDataAdvance('user',array('token'=>$token));
 		if(time()>$user->token_exptime){
 			$echoData->result=false;
 			$echoData->data='The token timeout!';
-			echo json_encode($echoData);
-			return false;
+			return $echoData;
 		}
 		$echoData->result=true;
 		$echoData->data=$user;
