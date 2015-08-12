@@ -171,6 +171,47 @@ class Api extends CI_Controller {
 		echo json_encode($echoData);
 
 	}
+	//通过email添加联系人
+	public function addContactByEmail(){
+		$echoData=new stdClass;
+		if(!isset($_POST['token']) || !isset($_POST['email'])){
+			$echoData->result=1;
+			$echoData->data='token and email can not be null!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$checkTokenResult=$this->common->checkToken($_POST['token']);
+		if(!$checkTokenResult->result){
+			$echoData->result=2;
+			$echoData->data=$checkTokenResult->data;
+			echo json_encode($echoData);
+			return false;
+		}
+		$user=$checkTokenResult->data;
+		$userId=$user->id;
+		if(!$this->common->isExist('user',array('email'=>$_POST['email']))){
+			$echoData->result=3;
+			$echoData->data='The contact does`t exist!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$contact=$this->common->getOneDataAdvance('user',array('email'=>$_POST['email']));
+		$contactId=$contact->id;
+		if($this->common->isExist('contact',array('userId'=>$userId,'contactId'=>$contactId))){
+			$echoData->result=4;
+			$echoData->data='The contact has been added as a friend!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$this->Dbhandler->insertData('contact',array(
+			'userId'=>$userId,
+			'contactId'=>$contactId
+		));
+		$echoData->result=0;
+		$echoData->data='Added successfully!';
+		echo json_encode($echoData);
+
+	}
 	//获取某个用户信息
 	public function getUser(){
 		$echoData=new stdClass;
