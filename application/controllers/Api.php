@@ -209,6 +209,7 @@ class Api extends CI_Controller {
 		));
 		$echoData->result=0;
 		$echoData->data='Added successfully!';
+		
 		echo json_encode($echoData);
 
 	}
@@ -235,6 +236,25 @@ class Api extends CI_Controller {
 			return false;
 		}
 		$user=$this->common->getOneDataById('user',$_GET['id']);
+		$echoData->result=0;
+		$echoData->data=$user;
+		echo json_encode($echoData);
+	}
+	public function getUserByVoipAccount(){
+		$echoData=new stdClass;
+		if(!isset($_GET['voipAccount'])){
+			$echoData->result=1;
+			$echoData->data='voipAccount can not be null!';
+			echo json_encode($echoData);
+			return false;
+		}
+		if(!$this->common->isExist('user',array('voipAccount'=>$_GET['voipAccount']))){
+			$echoData->result=3;
+			$echoData->data='This user does`t exist!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$user=$this->common->getOneDataAdvance('user',array('voipAccount'=>$_GET['voipAccount']));
 		$echoData->result=0;
 		$echoData->data=$user;
 		echo json_encode($echoData);

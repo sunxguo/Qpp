@@ -162,7 +162,16 @@ class CCPRestSDK {
 //        }
         return $datas;
 	  }
-        
+    
+    public function pushMsg(){
+
+      $result = $this->curl_post($url,$body,$header);
+      if($this->BodyType=="json"){//JSON格式
+        $datas=json_decode($result); 
+      }else{ //xml格式
+        $datas = simplexml_load_string(trim($result," \t\n\r"));
+      }
+    }    
     /**
     * 获取子帐号
     * @param startNo 开始的序号，默认从0开始
