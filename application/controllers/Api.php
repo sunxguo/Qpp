@@ -64,7 +64,6 @@ class Api extends CI_Controller {
 		$echoData->data='Registered successfully!';
 		echo json_encode($echoData);
 	}
-	
 	/**
 	 * return //0->success 1->Null error! 2->Email format error! 3->Password length error! 4->Email does not exist! 5->Password error!
 	 **/
@@ -166,6 +165,14 @@ class Api extends CI_Controller {
 			'userId'=>$userId,
 			'contactId'=>$_POST['contactId']
 		));
+		$sender=$user->voipAccount;
+		$contact=$this->getOneDataById('user',$_POST['contactId']);
+		$receiver=$contact->voipAccount;
+		$msgContentObj=new stdClass();
+		$msgContentObj->type=1;//申请添加好友
+		$msgContentObj->info=$contact;
+		$msgContent=json_encode($msgContentObj);
+		$this->common->pushMsg(1,$sender,$receiver,1,$msgContent);
 		$echoData->result=0;
 		$echoData->data='Added successfully!';
 		echo json_encode($echoData);
@@ -203,10 +210,19 @@ class Api extends CI_Controller {
 			echo json_encode($echoData);
 			return false;
 		}
+		
 		$this->Dbhandler->insertData('contact',array(
 			'userId'=>$userId,
 			'contactId'=>$contactId
 		));
+		$sender=$user->voipAccount;
+		$receiver=$contact->voipAccount;
+		$msgContentObj=new stdClass();
+		$msgContentObj->type=1;//申请添加好友
+		$msgContentObj->info=$contact;
+		$msgContent=json_encode($msgContentObj);
+		$this->common->pushMessage("1","$sender",'["'.$receiver.'"]',"1",$msgContent);
+
 		$echoData->result=0;
 		$echoData->data='Added successfully!';
 		

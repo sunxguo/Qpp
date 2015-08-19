@@ -148,6 +148,24 @@ class Common{
 	    }
 		return $echoData;
 	}
+	public function pushMessage($pushType,$sender,$receiver,$msgType,$msgContent){
+		//主帐号
+		$accountSid= 'aaf98f8944f35b130144f3b5412b0076';
+		//主帐号Token
+		$accountToken= 'f708d6bf0d33463bac5313571e91cbe9';
+		//应用Id
+		$appId='8a48b5514ecd7fa8014edc9c8ade1530';
+		//请求地址，格式如下，不需要写https://
+		$serverIP='app.cloopen.com';
+		//请求端口 
+		$serverPort='8883';
+		//REST版本号
+		$softVersion='2013-12-26';
+		$this->CI->load->library('CCPRestSDK',array('ServerIP'=>$serverIP,'ServerPort'=>$serverPort,'SoftVersion'=>$softVersion));
+		$this->CI->ccprestsdk->setAccount($accountSid,$accountToken);
+   		$this->CI->ccprestsdk->setAppId($appId);
+   		$result = $this->CI->ccprestsdk->pushMsg($pushType,$sender,$receiver,$msgType,$msgContent);
+	}
 	/*
 	public function globalSMS($phoneNumber,$text){
 		$param = array (

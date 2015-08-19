@@ -26,7 +26,7 @@ class CCPRestSDK {
 	private $ServerPort;
 	private $SoftVersion;
 	private $Batch;  //时间sh
-	private $BodyType = "xml";//包体格式，可填值：json 、xml
+	private $BodyType = "json";//包体格式，可填值：json 、xml
 	private $enabeLog = true; //日志开关。可填值：true、
 	private $Filename="../log.txt"; //日志文件
 	private $Handle; 
@@ -37,7 +37,7 @@ class CCPRestSDK {
 		$this->ServerIP = $parameters['ServerIP'];
 		$this->ServerPort = $parameters['ServerPort'];
 		$this->SoftVersion = $parameters['SoftVersion'];
-    $this->Handle = fopen($this->Filename, 'a');
+ //   $this->Handle = fopen($this->Filename, 'a');
 	}
 
    /**
@@ -163,14 +163,37 @@ class CCPRestSDK {
         return $datas;
 	  }
     
-    public function pushMsg(){
-
+    public function pushMsg($pushType,$sender,$receiver,$msgType,$msgContent){
+      $body='{
+                "pushType":'.$pushType.',
+                "appId":"'.($this->AppId).'",
+                "sender":'.$sender.',
+                "receiver":'.$receiver.',
+                "msgType":'.$msgType.',
+                "msgContent":\''.$msgContent.'\', 
+                "msgDomain":"Qpp",
+                "msgFileName":"",
+                "msgFileUrl":""
+              } ';
+//      $this->showlog("request body = ".$body);
+      // 大写的sig参数 
+      $sig =  strtoupper(md5($this->AccountSid . $this->AccountToken . $this->Batch));
+      // 生成请求URL
+      $url="https://$this->ServerIP:$this->ServerPort/$this->SoftVersion/Accounts/$this->AccountSid/IM/PushMsg?sig=$sig";
+//      $this->showlog("request url = ".$url);
+      
+      // 生成授权：主帐户Id + 英文冒号 + 时间戳。
+      $authen = base64_encode($this->AccountSid . ":" . $this->Batch);
+      // 生成包头 
+      $header = array("Accept:application/$this->BodyType","Content-Type:application/$this->BodyType;charset=utf-8","Authorization:$authen");
+      // 发送请求
       $result = $this->curl_post($url,$body,$header);
       if($this->BodyType=="json"){//JSON格式
         $datas=json_decode($result); 
       }else{ //xml格式
-        $datas = simplexml_load_string(trim($result," \t\n\r"));
+//        $datas = simplexml_load_string(trim($result," \t\n\r"));
       }
+      return $datas;
     }    
     /**
     * 获取子帐号
