@@ -49,7 +49,7 @@ class Api extends CI_Controller {
 			echo json_encode($echoData);
 			return false;
 		}
-		$this->Dbhandler->insertData('user',array(
+		$userInfo=array(
 			'email'=>$_POST['email'],
 			'password'=>md5('QppMK'.$_POST['password']),
 			'gender'=>2,
@@ -59,7 +59,11 @@ class Api extends CI_Controller {
 			'dateCreated'=>$subAccount->data->dateCreated,
 			'voipAccount'=>$subAccount->data->voipAccount,
 			'voipPwd'=>$subAccount->data->voipPwd
-		));
+		);
+		if(isset($_POST['name'])){
+			$userInfo['name']=$_POST['name'];
+		}
+		$this->Dbhandler->insertData('user',$userInfo);
 		$echoData->result=0;
 		$echoData->data='Registered successfully!';
 		echo json_encode($echoData);
