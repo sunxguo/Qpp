@@ -233,6 +233,62 @@ class Api extends CI_Controller {
 		echo json_encode($echoData);
 
 	}
+	public function response(){
+		$echoData=new stdClass;
+		if(!isset($_POST['token']) || !isset($_POST['contactId']) || !isset($_POST['result'])){
+			$echoData->result=1;
+			$echoData->data='token and contactId can not be null!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$checkTokenResult=$this->common->checkToken($_POST['token']);
+		if(!$checkTokenResult->result){
+			$echoData->result=2;
+			$echoData->data=$checkTokenResult->data;
+			echo json_encode($echoData);
+			return false;
+		}
+		$user=$checkTokenResult->data;
+		if(!$this->common->isExist('user',array('id'=>$_POST['contactId']))){
+			$echoData->result=3;
+			$echoData->data='The contact does`t exist!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$userId=$user->id;
+		$contact=$this->getOneDataById('user',$_POST['contactId']);
+
+		$contactId=$contact->id;
+		if($_POST['result']==1){
+			if($this->common->isExist('contact',array('userId'=>$userId,'contactId'=>$contactId))){
+				$echoData->result=4;
+				$echoData->data='The contact has been added as a friend!';
+				echo json_encode($echoData);
+				return false;
+			}
+			$this->Dbhandler->insertData('contact',array(
+				'userId'=>$userId,
+				'contactId'=>$contactId
+			));
+			$sender=$user->voipAccount;
+			$receiver=$contact->voipAccount;
+			$msgContentObj=new stdClass();
+			$msgContentObj->type=2;//添加好友的回应
+			$msgContentObj->info='添加成功';
+			$msgContent=json_encode($msgContentObj);
+			$this->common->pushMessage("1","$sender",'["'.$receiver.'"]',"1",$msgContent);
+
+			$echoData->result=0;
+			$echoData->data='Added successfully!';
+			
+			echo json_encode($echoData);
+		}else{
+			
+		}
+		
+		
+		
+	}
 	//获取某个用户信息
 	public function getUser(){
 		$echoData=new stdClass;
