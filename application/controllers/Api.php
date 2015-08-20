@@ -256,7 +256,7 @@ class Api extends CI_Controller {
 			return false;
 		}
 		$userId=$user->id;
-		$contact=$this->getOneDataById('user',$_POST['contactId']);
+		$contact=$this->common->getOneDataById('user',$_POST['contactId']);
 
 		$contactId=$contact->id;
 		if($_POST['result']==1){
@@ -279,7 +279,7 @@ class Api extends CI_Controller {
 			$this->common->pushMessage("1","$sender",'["'.$receiver.'"]',"1",$msgContent);
 
 			$echoData->result=0;
-			$echoData->data='Added successfully!';
+			$echoData->data='Successfully!';
 			
 			echo json_encode($echoData);
 		}else{
