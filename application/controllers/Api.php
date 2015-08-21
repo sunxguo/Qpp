@@ -270,6 +270,7 @@ class Api extends CI_Controller {
 				'userId'=>$userId,
 				'contactId'=>$contactId
 			));
+			/*
 			$sender=$user->voipAccount;
 			$receiver=$contact->voipAccount;
 			$msgContentObj=new stdClass();
@@ -277,7 +278,7 @@ class Api extends CI_Controller {
 			$msgContentObj->info='添加成功';
 			$msgContent=json_encode($msgContentObj);
 			$this->common->pushMessage("1","$sender",'["'.$receiver.'"]',"1",$msgContent);
-
+*/
 			$echoData->result=0;
 			$echoData->data='Successfully!';
 			
