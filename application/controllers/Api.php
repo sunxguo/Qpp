@@ -291,9 +291,6 @@ class Api extends CI_Controller {
 			
 			echo json_encode($echoData);
 		}
-		
-		
-		
 	}
 	//获取某个用户信息
 	public function getUser(){
@@ -386,5 +383,84 @@ class Api extends CI_Controller {
 	//删除联系人
 	public function deleteContact(){
 
+	}
+	public function share(){
+		$echoData=new stdClass;
+		if(!isset($_POST['token']) || !isset($_POST['moment'])){
+			$echoData->result=1;
+			$echoData->data='Token & moment can not be null!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$checkTokenResult=$this->common->checkToken($_POST['token']);
+		if(!$checkTokenResult->result){
+			$echoData->result=2;
+			$echoData->data=$checkTokenResult->data;
+			echo json_encode($echoData);
+			return false;
+		}
+		$user=$checkTokenResult->data;
+		$userId=$user->id;
+		$moment=json_decode($_POST['moment']);
+		$imagesArray=array();
+		foreach ($moment->images as $key => $value) {
+			$imagesArray[]=$this->common->convertToImage($value);
+		}
+		$content=new stdClass;
+		$content->text=$moment->text;
+		$content->images=$imagesArray;
+		$this->Dbhandler->insertData('moment',array(
+			'user'=>$userId,
+			'type'=>$moment->type,
+			'content'=>json_encode($content),
+			'time'=>date("Y-m-d H:i:s")
+		));
+		$echoData->result=0;
+		$echoData->data='Success!';
+		echo json_encode($echoData);
+	}
+	public function getMonments(){
+		$echoData=new stdClass;
+		if(!isset($_GET['token']) || !isset($_GET['userId'])){
+			$echoData->result=1;
+			$echoData->data='Token & userId can not be null!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$checkTokenResult=$this->common->checkToken($_GET['token']);
+		if(!$checkTokenResult->result){
+			$echoData->result=2;
+			$echoData->data=$checkTokenResult->data;
+			echo json_encode($echoData);
+			return false;
+		}
+//		$user=$checkTokenResult->data;
+		$userId=$_GET['userId'];
+		if(!$this->common->isExist('user',array('id'=>$userId))){
+			$echoData->result=3;
+			$echoData->data='This user does`t exist!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$condition=array(
+			'table' => 'moment',
+			'result' => 'data',
+			'where' => array('user' => $userId),
+//			'join' => array('user' => 'user.id = moment.user'),
+			'order_by' => array('`moment`.`time`' => 'DESC')
+		);
+		$moments=$this->common->getData($condition);
+		$allMoments=array();
+		foreach ($moments as $key => $value) {
+			$moment=new stdClass;
+			$moment->id=$value->id;
+			$moment->userId=$value->user;
+			$moment->content=$value->content;
+			$moment->time=$value->time;
+			$allMoments[]= $moment;
+		}
+		$echoData->result=0;
+		$echoData->data=$allMoments;
+		echo json_encode($echoData);
 	}
 }

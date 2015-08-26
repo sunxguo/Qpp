@@ -67,6 +67,28 @@ class Common{
 		$echoData->data=$user;
 		return $echoData;
 	}
+	public function convertToImage($stream){
+		//文件保存目录路径
+		$save_path = $_SERVER['DOCUMENT_ROOT'].'/uploads/';
+		//文件保存目录URL
+		$save_url = '/uploads/';
+		$save_path = realpath($save_path) . '/';
+		
+        $ymd = date("Ymd");
+		$save_path .= $ymd . "/";
+		$save_url .= $ymd . "/";
+		if (!file_exists($save_path)) {
+			mkdir($save_path);
+		}
+		//新文件名
+		$new_file_name = date("YmdHis") . '_' . rand(10000, 99999) . '.' . $file_ext;
+		$file_path = $save_path . $new_file_name;
+		$file_url = $save_url . $new_file_name;
+		$fp = fopen ($file_path, 'w+' );
+		fwrite ( $fp, $stream );  
+        fclose ( $fp );
+        return $file_url;
+	}
 	public function checkEmailFormat($email){
 		$regex = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[-_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,})$/i';
 		if (preg_match($regex, $email)) return true;
