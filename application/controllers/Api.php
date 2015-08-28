@@ -446,7 +446,7 @@ class Api extends CI_Controller {
 			'table' => 'moment',
 			'result' => 'data',
 			'where' => array('user' => $userId),
-//			'join' => array('user' => 'user.id = moment.user'),
+			'join' => array('user' => 'user.id = moment.user'),
 			'order_by' => array('`moment`.`time`' => 'DESC')
 		);
 		$moments=$this->common->getData($condition);
@@ -455,6 +455,8 @@ class Api extends CI_Controller {
 			$moment=new stdClass;
 			$moment->id=$value->id;
 			$moment->userId=$value->user;
+			$moment->name=$value->name;
+			$moment->avatar=$value->avatar;
 			$moment->content=$value->content;
 			$moment->time=$value->time;
 			$allMoments[]= $moment;
