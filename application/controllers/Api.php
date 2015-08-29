@@ -465,4 +465,57 @@ class Api extends CI_Controller {
 		$echoData->data=$allMoments;
 		echo json_encode($echoData);
 	}
+	public function getAllMonments(){
+		$echoData=new stdClass;
+		if(!isset($_GET['token'])){
+			$echoData->result=1;
+			$echoData->data='Token can not be null!';
+			echo json_encode($echoData);
+			return false;
+		}
+		$checkTokenResult=$this->common->checkToken($_GET['token']);
+		if(!$checkTokenResult->result){
+			$echoData->result=2;
+			$echoData->data=$checkTokenResult->data;
+			echo json_encode($echoData);
+			return false;
+		}
+		$user=$checkTokenResult->data;
+		$userId=$user->id;
+		$condition=array(
+			'table' => 'contact',
+			'result' => 'data',
+			'where' => array('userId' => $userId)
+		);
+		$contacts=$this->common->getData($condition);
+		$contactsIdArray=array();
+		foreach ($contacts as $key => $value) {
+			$contactsIdArray[]=$value->contactId;
+		}
+		$limit=isset($_GET['limit'])?$_GET['limit']:0;
+		$offset=isset($_GET['offset'])?$_GET['offset']:10;
+		$condition=array(
+			'table' => 'moment',
+			'result' => 'data',
+			'where_in' => array('user' => $contactsIdArray),
+			'limit' => array('limit' => $limit,'offset' => $offset),
+			'join' => array('user' => 'user.id = moment.user'),
+			'order_by' => array('`moment`.`time`' => 'DESC')
+		);
+		$moments=$this->common->getData($condition);
+		$allMoments=array();
+		foreach ($moments as $key => $value) {
+			$moment=new stdClass;
+			$moment->id=$value->id;
+			$moment->userId=$value->user;
+			$moment->name=$value->name;
+			$moment->avatar=$value->avatar;
+			$moment->content=json_decode($value->content);
+			$moment->time=$value->time;
+			$allMoments[]= $moment;
+		}
+		$echoData->result=0;
+		$echoData->data=$allMoments;
+		echo json_encode($echoData);
+	}
 }
