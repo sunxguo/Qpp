@@ -274,7 +274,6 @@ class Api extends CI_Controller {
 				'userId'=>$contactId,
 				'contactId'=>$userId
 			));
-			/*
 			$sender=$user->voipAccount;
 			$receiver=$contact->voipAccount;
 			$msgContentObj=new stdClass();
@@ -282,12 +281,11 @@ class Api extends CI_Controller {
 			$msgContentObj->info='添加成功';
 			$msgContent=json_encode($msgContentObj);
 			$this->common->pushMessage("1","$sender",'["'.$receiver.'"]',"1",$msgContent);
-*/
 			$echoData->result=0;
 			$echoData->data='Successfully!';
 			
 			echo json_encode($echoData);
-		}else{
+		}elseif($_POST['result']==2){
 			// $condition= array('table' => 'contact', 'where'=>array('userId'=>$contactId,'contactId'=>$userId));
 			// $this->Dbhandler->deleteData($condition);
 			$echoData->result=0;
