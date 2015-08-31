@@ -215,10 +215,10 @@ class Api extends CI_Controller {
 			return false;
 		}
 		
-		$this->Dbhandler->insertData('contact',array(
-			'userId'=>$userId,
-			'contactId'=>$contactId
-		));
+		// $this->Dbhandler->insertData('contact',array(
+		// 	'userId'=>$userId,
+		// 	'contactId'=>$contactId
+		// ));
 		$sender=$user->voipAccount;
 		$receiver=$contact->voipAccount;
 		$msgContentObj=new stdClass();
@@ -270,6 +270,10 @@ class Api extends CI_Controller {
 				'userId'=>$userId,
 				'contactId'=>$contactId
 			));
+			$this->Dbhandler->insertData('contact',array(
+				'userId'=>$contactId,
+				'contactId'=>$userId
+			));
 			/*
 			$sender=$user->voipAccount;
 			$receiver=$contact->voipAccount;
@@ -284,8 +288,8 @@ class Api extends CI_Controller {
 			
 			echo json_encode($echoData);
 		}else{
-			$condition= array('table' => 'contact', 'where'=>array('userId'=>$contactId,'contactId'=>$userId));
-			$this->Dbhandler->deleteData($condition);
+			// $condition= array('table' => 'contact', 'where'=>array('userId'=>$contactId,'contactId'=>$userId));
+			// $this->Dbhandler->deleteData($condition);
 			$echoData->result=0;
 			$echoData->data='Successfully!';
 			
