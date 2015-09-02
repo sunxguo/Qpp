@@ -276,9 +276,10 @@ class Api extends CI_Controller {
 			));
 			$sender=$user->voipAccount;
 			$receiver=$contact->voipAccount;
+			
 			$msgContentObj=new stdClass();
 			$msgContentObj->type=2;//添加好友的回应
-			$msgContentObj->info='添加成功';
+			$msgContentObj->info=$user;
 			$msgContent=json_encode($msgContentObj);
 			$this->common->pushMessage("1","$sender",'["'.$receiver.'"]',"1",$msgContent);
 			$echoData->result=0;
